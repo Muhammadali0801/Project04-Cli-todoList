@@ -1,7 +1,10 @@
 #! /usr/bin/env node
 import inquirer from "inquirer";
+import chalk from "chalk";
 let todos = [];
-async function craeteTodo(todos) {
+async function craeteTodo() {
+    // Welcoming message
+    console.log(chalk.green("Welcome to the TODO List Manager!"));
     do {
         let question = await inquirer.prompt({
             type: "list",
@@ -10,7 +13,8 @@ async function craeteTodo(todos) {
             choices: ["Add", "Update", "View", "Delete", "Exit"],
         });
         if (question.select === "Exit") {
-            console.log("Exiting the program...");
+            // Ending message
+            console.log(chalk.blue("Thank you for using the TODO List Manager. Goodbye!"));
             break;
         }
         if (question.select === "Add") {
@@ -18,9 +22,16 @@ async function craeteTodo(todos) {
                 type: "input",
                 message: "Add items in the list",
                 name: "addTodo",
+                validate: function (input) {
+                    if (input.trim() === "") {
+                        return chalk.red("You must enter a task!");
+                    }
+                    return true;
+                },
             });
             todos.push(addList.addTodo);
-            todos.forEach((todo) => console.log(todo));
+            console.log(chalk.yellow("Current TODO List:"));
+            todos.forEach((todo) => console.log(chalk.yellow(todo)));
         }
         if (question.select === "Update") {
             let updateTodo = await inquirer.prompt({
@@ -33,14 +44,21 @@ async function craeteTodo(todos) {
                 type: "input",
                 message: "Enter new value",
                 name: "newValue",
+                validate: function (input) {
+                    if (input.trim() === "") {
+                        return chalk.red("You must enter a new value!");
+                    }
+                    return true;
+                },
             });
             todos = todos.map((todo) => todo === updateTodo.selectedTodo ? newTodo.newValue : todo);
-            todos.forEach((upTodo) => console.log(upTodo));
+            console.log(chalk.yellow("Updated TODO List:"));
+            todos.forEach((upTodo) => console.log(chalk.yellow(upTodo)));
         }
         if (question.select === "View") {
-            console.log("*** TO DO LIST ***");
-            todos.forEach((todoview) => console.log(todoview));
-            console.log("*****************");
+            console.log(chalk.magenta("*** TO DO LIST ***"));
+            todos.forEach((todoview) => console.log(chalk.magenta(todoview)));
+            console.log(chalk.magenta("*****************"));
         }
         if (question.select === "Delete") {
             let deleteTodo = await inquirer.prompt({
@@ -50,8 +68,9 @@ async function craeteTodo(todos) {
                 choices: todos,
             });
             todos = todos.filter((todo) => todo !== deleteTodo.deletedTodo);
-            todos.forEach((todoDelete) => console.log(todoDelete));
+            console.log(chalk.red("TODO List after deletion:"));
+            todos.forEach((todoDelete) => console.log(chalk.red(todoDelete)));
         }
     } while (true);
 }
-craeteTodo(todos);
+craeteTodo();
